@@ -1,0 +1,29 @@
+######################################################################
+############################## 分区重分配 #############################
+######################################################################
+# 1、编辑allTopics.json文件，写入需要重分配的topic
+{"topics":[{"topic":"RDP_HBASE_SINK"},{"topic":"RDP_HBASE_SINK_MIN"}],"version":1}
+
+# 2、获取分区重分配计划，把生成的结果放入reassignment-node.json文件
+bin/kafka-reassign-partitions.sh --zookeeper 172.25.223.53:2181,172.25.239.165:2181,172.25.223.54:2181/bdpkafka --generate --topics-to-move-json-file allTopics.json --broker-list "6,7"
+
+# 3、执行分区重分配计划，throttle是用来限速的
+bin/kafka-reassign-partitions.sh --zookeeper 172.25.223.53:2181,172.25.239.165:2181,172.25.223.54:2181/bdpkafka --reassignment-json-file reassignment-node.json --execute --throttle 100000000
+
+# 4、查看分区重分配进度
+bin/kafka-reassign-partitions.sh --zookeeper 172.25.223.53:2181,172.25.239.165:2181,172.25.223.54:2181/bdpkafka --reassignment-json-file reassignment-node.json --verify
+
+
+
+######################################################################
+############################## 优先副本 ###############################
+######################################################################
+# 优先副本即 AR 集合中的第一个副本，当分区leader出现故障时，会直接使用优先副本作为新的leader，默认开启
+# 在关闭了auto.leader.rebalance.enable的情况下，必要时刻可以手动进行leader分区平衡
+# 1、编辑preferred.json
+{"partitions":[{"topic": "foo", "partition": 1},{"topic": "foobar", "partition": 2}]} 
+# 2、执行优先副本
+bin/kafka-preferred-replica-election.sh --zookeeper 172.25.223.53:2181,172.25.239.165:2181,172.25.223.54:2181/bdpkafka --path-to-json-file preferred.json
+
+
+
