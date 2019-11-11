@@ -5,13 +5,13 @@
 {"topics":[{"topic":"RDP_HBASE_SINK"},{"topic":"RDP_HBASE_SINK_MIN"}],"version":1}
 
 # 2、获取分区重分配计划，把生成的结果放入reassignment-node.json文件
-bin/kafka-reassign-partitions.sh --zookeeper 172.25.223.53:2181,172.25.239.165:2181,172.25.223.54:2181/bdpkafka --generate --topics-to-move-json-file allTopics.json --broker-list "6,7"
+bin/kafka-reassign-partitions.sh --zookeeper zk01:2181,zk02:2181,zk03:2181/kafka --generate --topics-to-move-json-file allTopics.json --broker-list "6,7"
 
 # 3、执行分区重分配计划，throttle是用来限速的
-bin/kafka-reassign-partitions.sh --zookeeper 172.25.223.53:2181,172.25.239.165:2181,172.25.223.54:2181/bdpkafka --reassignment-json-file reassignment-node.json --execute --throttle 100000000
+bin/kafka-reassign-partitions.sh --zookeeper zk01:2181,zk02:2181,zk03:2181/kafka --reassignment-json-file reassignment-node.json --execute --throttle 100000000
 
 # 4、查看分区重分配进度
-bin/kafka-reassign-partitions.sh --zookeeper 172.25.223.53:2181,172.25.239.165:2181,172.25.223.54:2181/bdpkafka --reassignment-json-file reassignment-node.json --verify
+bin/kafka-reassign-partitions.sh --zookeeper zk01:2181,zk02:2181,zk03:2181/kafka --reassignment-json-file reassignment-node.json --verify
 
 
 
@@ -23,7 +23,7 @@ bin/kafka-reassign-partitions.sh --zookeeper 172.25.223.53:2181,172.25.239.165:2
 # 1、编辑preferred.json
 {"partitions":[{"topic": "foo", "partition": 1},{"topic": "foobar", "partition": 2}]} 
 # 2、执行优先副本
-bin/kafka-preferred-replica-election.sh --zookeeper 172.25.223.53:2181,172.25.239.165:2181,172.25.223.54:2181/bdpkafka --path-to-json-file preferred.json
+bin/kafka-preferred-replica-election.sh --zookeeper zk01:2181,zk02:2181,zk03:2181/kafka --path-to-json-file preferred.json
 
 
 
